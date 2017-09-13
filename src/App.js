@@ -1,39 +1,29 @@
 import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
-import { Table } from 'react-bootstrap';
+import Transactions from './Transactions';
 
 class App extends Component {
-  convertDate(timeStamp) {
-    return new Date(timeStamp).toLocaleString();
+  constructor(props){
+    super(props);
+    this.state = {
+      transactions: [],
+      activePage: 1,
+      maxPerPage: 10
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    this.setState({ transactions: nextProps.transactions })
   }
   render() {
-    const balance = this.props.transactions.reduce((total, transaction) => total + transaction.transAmt, 0)
+    const balance = this.props.transactions.reduce((total, transaction) => total + transaction.transAmt, 0),
+    limit = this.state.activePage * this.state.maxPerPage,
+    items = Math.ceil(this.props.transactions.length / this.state.maxPerPage),
+    transactions = this.state.transactions.slice(limit - this.state.maxPerPage, limit);
     return (
       <div>
         <p>{`Balance: $${balance.toLocaleString()}`}</p>
-        <Table responsive>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Description</th>
-              <th>To</th>
-              <th>From</th>
-            </tr>
-          </thead>
-          <tbody>
-        {this.props.transactions.map(transaction =>
-          <tr key={transaction.transId}>
-            <td>{this.convertDate(transaction.transTime)}</td>
-            <td>{transaction.transAmt}</td>
-            <td>{transaction.description}</td>
-            <td>{transaction.transTo}</td>
-            <td>{transaction.transFrom}</td>
-          </tr>
-          )}
-          </tbody>
-        </Table>
+        <Transactions transactions={transactions} />
       </div>
     );
   }
