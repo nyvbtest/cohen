@@ -1,44 +1,54 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Table, Button } from 'react-bootstrap';
+import React from 'react';
+import { Table, Button, Glyphicon } from 'react-bootstrap';
 
-export default class Transactions extends Component {
-  constructor(props){
-    super(props);
-  }
-  convertDate(timeStamp) {
-    return new Date(timeStamp).toLocaleString();
-  }
-  colName(label, func) {
-    return <Button bsStyle='link'>{label}</Button>
-  }
-  render() {
-    const transactions = this.props.transactions;
-    return (
-      <div>
-        <Table responsive>
-          <thead>
-            <tr>
-              <th>{this.colName('Date')}</th>
-              <th>{this.colName('Amount')}</th>
-              <th>{this.colName('Description')}</th>
-              <th>{this.colName('To')}</th>
-              <th>{this.colName('From')}</th>
-            </tr>
-          </thead>
-          <tbody>
-        {transactions.map(transaction =>
-          <tr key={transaction.transId}>
-            <td>{this.convertDate(transaction.transTime)}</td>
-            <td>{transaction.transAmt}</td>
-            <td>{transaction.description}</td>
-            <td>{transaction.transTo}</td>
-            <td>{transaction.transFrom}</td>
+import './Transactions.css';
+
+const Transactions = props => {
+
+  const convertDate = timeStamp => new Date(timeStamp).toDateString().slice(4);
+
+  const convertAmount = amount => {
+    let formattedAmt = amount.toLocaleString();
+    formattedAmt = amount < 0 ? `-$${formattedAmt.slice(1)}` : `$${formattedAmt}`;
+    if (!formattedAmt.includes('.')) formattedAmt += '.00';
+    if (formattedAmt[formattedAmt.length - 2] === '.') formattedAmt += '0';
+    return formattedAmt;
+    }
+
+  const glyph = direction => <Glyphicon glyph={`glyphicon glyphicon-chevron-${direction}`} />;
+
+  const colName = (label, arrow, func) =>
+    <Button bsStyle='link' onClick={func} >
+    {arrow ? glyph(arrow) : null}
+      {label}
+    </Button>;
+
+  return (
+    <div>
+      <Table responsive>
+        <thead>
+          <tr>
+            <th>{colName('Date')}</th>
+            <th>{colName('Amount')}</th>
+            <th>{colName('Description', props.descriptionOrder, props.descriptionSort)}</th>
+            <th>{colName('To')}</th>
+            <th>{colName('From')}</th>
           </tr>
-          )}
-          </tbody>
-        </Table>
-      </div>
-    );
-  }
+        </thead>
+        <tbody>
+      {props.transactions.map(transaction =>
+        <tr key={transaction.transId}>
+          <td>{convertDate(transaction.transTime)}</td>
+          <td>{convertAmount(transaction.transAmt)}</td>
+          <td>{transaction.description}</td>
+          <td>{transaction.transTo}</td>
+          <td>{transaction.transFrom}</td>
+        </tr>
+        )}
+        </tbody>
+      </Table>
+    </div>
+  );
 }
+
+export default Transactions;
