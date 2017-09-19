@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
 import Transactions from './Transactions';
-import { convertLabel } from './utils';
-import { Well } from 'react-bootstrap';
+import { convertLabel, calculateBalance, oneDay } from './utils';
+import { Well, FormControl } from 'react-bootstrap';
 
 export class App extends Component {
   constructor(props){
@@ -15,7 +15,9 @@ export class App extends Component {
       descriptionOrder: null,
       amountOrder: null,
       toOrder: null,
-      fromOrder: null
+      fromOrder: null,
+      dateRange: 0,
+      transType: 0
     }
     this.sortColumn = this.sortColumn.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
@@ -48,31 +50,62 @@ export class App extends Component {
   }
 
   alphaSort(dataProp) {
-    return this.state.transactions.sort((a, b) => a[dataProp].toLowerCase() < b[dataProp].toLowerCase() ? -1 : 1);
+    const transactions = this.state.transactions;
+    return transactions.sort((a, b) => a[dataProp].toLowerCase() < b[dataProp].toLowerCase() ? -1 : 1);
   }
 
   numSort(dataProp) {
-    return this.state.transactions.sort((a, b) => b[dataProp] - a[dataProp]);
+    const transactions = this.state.transactions;
+    return transactions.sort((a, b) => b[dataProp] - a[dataProp]);
   }
 
   handleSelect(eventKey) {
     this.setState({ activePage: eventKey })
   }
 
+  calculateChange() {
+    const today = new Date(),
+      pastDay = today - oneDay;
+    return calculateBalance(this.props.transactions.filter(transaction => transaction.transTime > pastDay));
+  }
+
+  filterByDate(transactions) {
+    return this.state.dateRange ? transactions.filter(transaction => transaction.transTime > new Date() - this.state.dateRange * oneDay) : transactions;
+  }
+
+  filterByType(transactions) {
+    return this.state.transType ? transactions.filter(transaction => transaction.transAmt * this.state.transType > 0) : transactions;
+  }
+
   render() {
 
-    const balance = this.props.transactions.reduce((total, transaction) => total + transaction.transAmt, 0),
+    const balance = calculateBalance(this.props.transactions),
+      filteredTransactions = this.filterByType(this.filterByDate(this.state.transactions)),
+      items = Math.ceil(filteredTransactions.length / 10),
       limit = this.state.activePage * 10,
-      items = Math.ceil(this.props.transactions.length / 10),
-      transactions = this.state.transactions.slice(limit - 10, limit);
+      currentTransactions = filteredTransactions.slice(limit - 10, limit);
 
     return (
       <div className='container'>
         <div className='sidebar col-lg-2 col-md-2 col-sm-2 col-xs-12'>
-          <Well bsSize="large">{`Balance: $${balance.toLocaleString()}`}</Well>
+          <Well bsSize="large">
+            <p>{`Balance: $${balance.toLocaleString()}`}</p>
+            <p>{`Change in last 24 hours: ${this.calculateChange()}`}</p>
+            <FormControl componentClass="select" onChange={e => this.setState({ dateRange: +e.target.value })}>
+              <option value={0}>All</option>
+              <option value={7}>7</option>
+              <option value={30}>30</option>
+              <option value={90}>90</option>
+            </FormControl>
+            <FormControl componentClass="select" onChange={e => this.setState({ transType: +e.target.value })}>
+              <option value={0}>All</option>
+              <option value={1}>Deposit</option>
+              <option value={-1}>Withdrawal</option>
+            </FormControl>
+          </Well>
         </div>
         <div className='col-lg-10 col-md-10 col-sm-10 col-xs-12'>
-          <Transactions transactions={transactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} items={items} activePage={this.state.activePage} handleSelect={this.handleSelect} />
+          <Transactions transactions={currentTransactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} items={items} activePage={this.state.activePage} handleSelect={this.handleSelect} />
         </div>
       </div>
     );

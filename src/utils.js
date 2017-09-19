@@ -1,3 +1,5 @@
+export const calculateBalance = transactions => transactions.reduce((total, transaction) => total + transaction.transAmt, 0)
+
 export const convertLabel = label => {
     switch (label) {
       case 'Date':
@@ -23,60 +25,73 @@ export const convertAmount = amount => {
   return formattedAmt;
   }
 
+export const oneDay = 24 * 60 * 60 * 1000;
+
 export const transactions = [
   {
     transId: 1,
     transAmt: 2,
-    transTo: 'BankB'
+    transTo: 'BankB',
+    transTime: new Date() - oneDay * 91
   },
   {
     transId: 2,
     transAmt: 2,
-    transTo: 'BankA'
+    transTo: 'BankA',
+    transTime: new Date() - oneDay * 31
   },
   {
     transId: 3,
     transAmt: 11,
-    transTo: 'BankC'
+    transTo: 'BankC',
+    transTime: new Date() - oneDay * 8
   },
   {
     transId: 4,
     transAmt: 2,
-    transTo: 'BankD'
+    transTo: 'BankD',
+    transTime: new Date()
   },
   {
     transId: 5,
     transAmt: 2,
-    transTo: 'BankE'
+    transTo: 'BankE',
+    transTime: new Date()
   },
   {
     transId: 6,
     transAmt: -1,
-    transTo: 'BankF'
+    transTo: 'BankF',
+    transTime: new Date()
   },
   {
     transId: 7,
     transAmt: 2,
-    transTo: 'BankG'
+    transTo: 'BankG',
+    transTime: new Date()
   },
   {
     transId: 8,
     transAmt: 2,
-    transTo: 'BankH'
+    transTo: 'BankH',
+    transTime: new Date()
   },
   {
     transId: 9,
     transAmt: 2,
-    transTo: 'BankI'
+    transTo: 'BankI',
+    transTime: new Date()
   },
   {
     transId: 10,
     transAmt: 2,
-    transTo: 'BankJ'
+    transTo: 'BankJ',
+    transTime: new Date()
   },
   {
     transId: 11,
     transAmt: 2,
-    transTo: 'BankK'
+    transTo: 'BankK',
+    transTime: new Date() - oneDay * 2
   }
 ]
