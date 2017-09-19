@@ -1,43 +1,39 @@
 import React from 'react';
 import { Table, Button, Glyphicon } from 'react-bootstrap';
 
+import { convertDate, convertAmount } from './utils';
+
 import './Transactions.css';
 
 const Transactions = props => {
 
-  const convertDate = timeStamp => new Date(timeStamp).toDateString().slice(4);
+  const createGlyph = direction => <Glyphicon glyph={`glyphicon glyphicon-chevron-${direction}`} />;
 
-  const convertAmount = amount => {
-    let formattedAmt = amount.toLocaleString();
-    formattedAmt = amount < 0 ? `-$${formattedAmt.slice(1)}` : `$${formattedAmt}`;
-    if (!formattedAmt.includes('.')) formattedAmt += '.00';
-    if (formattedAmt[formattedAmt.length - 2] === '.') formattedAmt += '0';
-    return formattedAmt;
-    }
-
-  const glyph = direction => <Glyphicon glyph={`glyphicon glyphicon-chevron-${direction}`} />;
-
-  const colName = (label, arrow, func) =>
-    <Button bsStyle='link' onClick={func} >
-    {arrow ? glyph(arrow) : null}
-      {label}
-    </Button>;
+  const createColName = label => {
+    const arrow = props[`${label.toLowerCase()}Order`];
+    return (
+      <Button bsStyle='link' onClick={() => props.sortColumn(label)} >
+        {arrow ? createGlyph(arrow) : null}
+          {label}
+      </Button>
+    )
+    };
 
   return (
     <div>
       <Table responsive>
         <thead>
           <tr>
-            <th>{colName('Date')}</th>
-            <th>{colName('Amount')}</th>
-            <th>{colName('Description', props.descriptionOrder, props.descriptionSort)}</th>
-            <th>{colName('To')}</th>
-            <th>{colName('From')}</th>
+            <th>{createColName('Date')}</th>
+            <th>{createColName('Amount')}</th>
+            <th>{createColName('Description')}</th>
+            <th>{createColName('To')}</th>
+            <th>{createColName('From')}</th>
           </tr>
         </thead>
         <tbody>
       {props.transactions.map(transaction =>
-        <tr key={transaction.transId}>
+        <tr key={transaction.transId} className='tableRow' >
           <td>{convertDate(transaction.transTime)}</td>
           <td>{convertAmount(transaction.transAmt)}</td>
           <td>{transaction.description}</td>

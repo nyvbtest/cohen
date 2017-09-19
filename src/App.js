@@ -2,41 +2,55 @@ import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
 import Transactions from './Transactions';
+import { convertLabel } from './utils';
 
-class App extends Component {
+export class App extends Component {
   constructor(props){
     super(props);
     this.state = {
       transactions: [],
       activePage: 1,
       dateOrder: 'down',
-      descriptionOrder: undefined
+      descriptionOrder: null,
+      amountOrder: null,
+      toOrder: null,
+      fromOrder: null
     }
-    this.descriptionSort = this.descriptionSort.bind(this);
+    this.sortColumn = this.sortColumn.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({ transactions: nextProps.transactions })
   }
 
-  descriptionSort() {
-    const type = 'description';
-    let newOrder, sorted
-    switch (this.state[`${type}Order`]) {
+  sortColumn(label) {
+    const dataProp = convertLabel(label),
+      stateProp = `${label.toLowerCase()}Order`,
+      transactions = this.state.transactions;
+    let newOrder, sorted;
+    switch (this.state[stateProp]) {
     case 'up':
-      newOrder = 'down'
-      sorted = this.state.transactions.reverse()
+      newOrder = 'down';
+      sorted = transactions.reverse();
       break
     case 'down':
-      newOrder = 'up'
-      sorted = this.state.transactions.reverse()
+      newOrder = 'up';
+      sorted = transactions.reverse();
       break
     default:
-      newOrder = 'up'
-      sorted = this.state.transactions.sort((a, b) => a[type].toLowerCase() < b[type].toLowerCase() ? -1 : 1)
+      [newOrder, sorted] = isNaN(transactions[0][dataProp]) ? ['up', this.alphaSort(dataProp)] : ['down', this.numSort(dataProp)];
     }
-    let descriptionOrder, dateOrder, amountOrder, toOrder, fromOrder;
-    this.setState({ transactions: sorted, descriptionOrder: newOrder, dateOrder: dateOrder, amountOrder: amountOrder, toOrder: toOrder, fromOrder: fromOrder })
+    const newState = { transactions: sorted, descriptionOrder: null, dateOrder: null, amountOrder: null, toOrder: null, fromOrder: null };
+    newState[stateProp] = newOrder;
+    this.setState(newState);
+  }
+
+  alphaSort(dataProp) {
+    return this.state.transactions.sort((a, b) => a[dataProp].toLowerCase() < b[dataProp].toLowerCase() ? -1 : 1);
+  }
+
+  numSort(dataProp) {
+    return this.state.transactions.sort((a, b) => b[dataProp] - a[dataProp]);
   }
 
   render() {
@@ -47,9 +61,9 @@ class App extends Component {
       transactions = this.state.transactions.slice(limit - 10, limit);
 
     return (
-      <div>
+      <div className='hi'>
         <p>{`Balance: $${balance.toLocaleString()}`}</p>
-        <Transactions transactions={transactions} descriptionOrder={this.state.descriptionOrder} descriptionSort={this.descriptionSort} />
+        <Transactions transactions={transactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} />
       </div>
     );
   }

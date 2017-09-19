@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-const initialTransactionsState = [];
-
 const LOADED_TRANSACTIONS = 'LOADED_TRANSACTIONS';
 
 export const loadedTransactions = transactions => ({
@@ -18,14 +16,11 @@ export const loadTransactions = () => {
   };
 };
 
-export default function (state = initialTransactionsState, action) {
-
+export default function (state = [], action) {
   switch (action.type) {
     case LOADED_TRANSACTIONS:
-      return action.transactions;
+      return action.transactions.sort((a, b) => b.transTime - a.transTime);
     default:
       return state;
-
   }
-
 }
