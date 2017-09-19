@@ -1,6 +1,8 @@
 import React from 'react';
 import { Table, Button, Glyphicon } from 'react-bootstrap';
+// import { Link } from 'react-router';
 
+import Pages from './Pages';
 import { convertDate, convertAmount } from './utils';
 
 import './Transactions.css';
@@ -21,7 +23,7 @@ const Transactions = props => {
 
   return (
     <div>
-      <Table responsive>
+      <Table responsive striped hover>
         <thead>
           <tr>
             <th>{createColName('Date')}</th>
@@ -33,7 +35,7 @@ const Transactions = props => {
         </thead>
         <tbody>
       {props.transactions.map(transaction =>
-        <tr key={transaction.transId} className='tableRow' >
+        <tr key={transaction.transId} className='tableRow' onClick={() => props.navigate(transaction)} >
           <td>{convertDate(transaction.transTime)}</td>
           <td>{convertAmount(transaction.transAmt)}</td>
           <td>{transaction.description}</td>
@@ -43,6 +45,9 @@ const Transactions = props => {
         )}
         </tbody>
       </Table>
+      <div className='pages'>
+        <Pages items={props.items} activePage={props.activePage} handleSelect={props.handleSelect} />
+      </div>
     </div>
   );
 }

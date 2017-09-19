@@ -3,6 +3,7 @@ import './App.css';
 import { connect } from 'react-redux';
 import Transactions from './Transactions';
 import { convertLabel } from './utils';
+import { Well } from 'react-bootstrap';
 
 export class App extends Component {
   constructor(props){
@@ -17,6 +18,7 @@ export class App extends Component {
       fromOrder: null
     }
     this.sortColumn = this.sortColumn.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -53,17 +55,25 @@ export class App extends Component {
     return this.state.transactions.sort((a, b) => b[dataProp] - a[dataProp]);
   }
 
+  handleSelect(eventKey) {
+    this.setState({ activePage: eventKey })
+  }
+
   render() {
 
     const balance = this.props.transactions.reduce((total, transaction) => total + transaction.transAmt, 0),
       limit = this.state.activePage * 10,
-      // items = Math.ceil(this.props.transactions.length / 10),
+      items = Math.ceil(this.props.transactions.length / 10),
       transactions = this.state.transactions.slice(limit - 10, limit);
 
     return (
-      <div className='hi'>
-        <p>{`Balance: $${balance.toLocaleString()}`}</p>
-        <Transactions transactions={transactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} />
+      <div className='container'>
+        <div className='sidebar col-lg-2 col-md-2 col-sm-2 col-xs-12'>
+          <Well bsSize="large">{`Balance: $${balance.toLocaleString()}`}</Well>
+        </div>
+        <div className='col-lg-10 col-md-10 col-sm-10 col-xs-12'>
+          <Transactions transactions={transactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} items={items} activePage={this.state.activePage} handleSelect={this.handleSelect} />
+        </div>
       </div>
     );
   }

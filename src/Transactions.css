@@ -1,3 +1,15 @@
 .btn-link {
   padding-left: 0;
 }
+
+.pages {
+  text-align: center;
+}
+
+.pagination {
+  margin: 0;
+}
+
+.tableRow {
+  cursor: pointer;
+}
