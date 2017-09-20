@@ -3,7 +3,7 @@ import './App.css';
 import { connect } from 'react-redux';
 import Transactions from './Transactions';
 import { convertLabel, calculateBalance, oneDay } from './utils';
-import { Well, FormControl } from 'react-bootstrap';
+import { Well, FormControl, Button } from 'react-bootstrap';
 
 export class App extends Component {
   constructor(props){
@@ -17,10 +17,13 @@ export class App extends Component {
       toOrder: null,
       fromOrder: null,
       dateRange: 0,
-      transType: 0
+      transType: 0,
+      searchTerm: ''
     }
     this.sortColumn = this.sortColumn.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
+    this.submitSearch = this.submitSearch.bind(this);
+    this.search = this.search.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,10 +80,24 @@ export class App extends Component {
     return this.state.transType ? transactions.filter(transaction => transaction.transAmt * this.state.transType > 0) : transactions;
   }
 
+  search(transactions) {
+    const searchTerm = this.state.searchTerm.toLowerCase();
+    return searchTerm ? transactions.filter(transaction => transaction.description.toLowerCase() === searchTerm || transaction.transTo.toLowerCase() === searchTerm || transaction.transFrom.toLowerCase() === searchTerm) : transactions;
+  }
+
+  submitSearch(e) {
+    e.preventDefault();
+    this.setState({ searchTerm: e.target.search.value })
+  }
+
+  filterTransactions(transactions) {
+    return this.search(this.filterByType(this.filterByDate(transactions)));
+  }
+
   render() {
 
     const balance = calculateBalance(this.props.transactions),
-      filteredTransactions = this.filterByType(this.filterByDate(this.state.transactions)),
+      filteredTransactions = this.filterTransactions(this.state.transactions),
       items = Math.ceil(filteredTransactions.length / 10),
       limit = this.state.activePage * 10,
       currentTransactions = filteredTransactions.slice(limit - 10, limit);
@@ -102,6 +119,17 @@ export class App extends Component {
               <option value={1}>Deposit</option>
               <option value={-1}>Withdrawal</option>
             </FormControl>
+            <form onSubmit={this.submitSearch} >
+              <FormControl
+                name="search"
+                type="text"
+                label="Text"
+                placeholder="Enter text"
+              />
+              <Button type='submit'>
+                Submit
+              </Button>
+            </form>
           </Well>
         </div>
         <div className='col-lg-10 col-md-10 col-sm-10 col-xs-12'>

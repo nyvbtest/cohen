@@ -63,3 +63,16 @@ test('filterByType filters by deposit or withdrawal', () => {
   app.instance().setState({ transType: 0 });
   expect(app.instance().filterByType(transactions).length).toBe(11);
 });
+
+test('search works', () => {
+  const app = mount(<App transactions={transactions} />);
+
+  app.instance().setState({ searchTerm: 'BankA' });
+  expect(app.instance().search(transactions).length).toBe(1);
+
+  app.instance().setState({ searchTerm: 'B' });
+  expect(app.instance().search(transactions).length).toBe(6);
+
+  app.instance().setState({ searchTerm: 'donation' });
+  expect(app.instance().search(transactions).length).toBe(4);
+});

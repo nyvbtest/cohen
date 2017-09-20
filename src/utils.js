@@ -27,71 +27,94 @@ export const convertAmount = amount => {
 
 export const oneDay = 24 * 60 * 60 * 1000;
 
+// dummy data for testing
 export const transactions = [
   {
     transId: 1,
     transAmt: 2,
     transTo: 'BankB',
+    transFrom: 'A',
+    description: 'Donation',
     transTime: new Date() - oneDay * 91
   },
   {
     transId: 2,
     transAmt: 2,
     transTo: 'BankA',
+    transFrom: 'A',
+    description: 'Donation',
     transTime: new Date() - oneDay * 31
   },
   {
     transId: 3,
     transAmt: 11,
     transTo: 'BankC',
+    transFrom: 'A',
+    description: 'Donation',
     transTime: new Date() - oneDay * 8
   },
   {
     transId: 4,
     transAmt: 2,
     transTo: 'BankD',
+    transFrom: 'A',
+    description: 'Donation',
     transTime: new Date()
   },
   {
     transId: 5,
     transAmt: 2,
     transTo: 'BankE',
+    transFrom: 'A',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 6,
     transAmt: -1,
     transTo: 'BankF',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 7,
     transAmt: 2,
     transTo: 'BankG',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 8,
     transAmt: 2,
     transTo: 'BankH',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 9,
     transAmt: 2,
     transTo: 'BankI',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 10,
     transAmt: 2,
     transTo: 'BankJ',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date()
   },
   {
     transId: 11,
     transAmt: 2,
     transTo: 'BankK',
+    transFrom: 'B',
+    description: 'Salary',
     transTime: new Date() - oneDay * 2
   }
 ]
