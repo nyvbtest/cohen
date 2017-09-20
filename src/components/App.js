@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import './App.css';
 import { connect } from 'react-redux';
+
 import Bar from './Bar';
 import Sidebar from './Sidebar';
-import { convertLabel, calculateBalance, oneDay } from './utils';
+import { convertLabel, calculateBalance, oneDay } from '../utils';
+
+import './App.css';
 
 export class App extends Component {
   constructor(props){
@@ -18,8 +20,7 @@ export class App extends Component {
       fromOrder: null,
       dateRange: 0,
       transType: 0,
-      searchTerm: '',
-      filtered: false
+      searchTerm: ''
     }
     this.sortColumn = this.sortColumn.bind(this);
     this.selectPage = this.selectPage.bind(this);
@@ -33,92 +34,108 @@ export class App extends Component {
     this.setState({ transactions: nextProps.transactions })
   }
 
-  sortColumn(label) {
-    const dataProp = convertLabel(label),
-      stateProp = `${label.toLowerCase()}Order`,
-      transactions = this.state.transactions;
-    let newOrder, sorted;
-    switch (this.state[stateProp]) {
-    case 'up':
-      newOrder = 'down';
-      sorted = transactions.reverse();
-      break
-    case 'down':
-      newOrder = 'up';
-      sorted = transactions.reverse();
-      break
-    default:
-      [newOrder, sorted] = isNaN(transactions[0][dataProp]) ? ['up', this.alphaSort(dataProp)] : ['down', this.numSort(dataProp)];
-    }
-    const newState = { transactions: sorted, descriptionOrder: null, dateOrder: null, amountOrder: null, toOrder: null, fromOrder: null };
-    newState[stateProp] = newOrder;
-    this.setState(newState);
-  }
-
-  alphaSort(dataProp) {
-    const transactions = this.state.transactions;
-    return transactions.sort((a, b) => a[dataProp].toLowerCase() < b[dataProp].toLowerCase() ? -1 : 1);
-  }
-
-  numSort(dataProp) {
-    const transactions = this.state.transactions;
-    return transactions.sort((a, b) => b[dataProp] - a[dataProp]);
-  }
-
-  selectPage(eventKey) {
-    this.setState({ activePage: eventKey })
-  }
-
-  selectDateRange(eventKey) {
-    this.setState({ dateRange: eventKey, filtered: true })
-  }
-
-  selectType(eventKey) {
-    this.setState({ transType: eventKey, filtered: true })
-  }
-
+  // in Sidebar
+  // calculate change in account value in past 24 hours
   calculateChange() {
     const today = new Date(),
       pastDay = today - oneDay;
     return calculateBalance(this.props.transactions.filter(transaction => transaction.transTime > pastDay));
   }
 
+  // in TransactionsTable
+  sortColumn(label) {
+    const dataProp = convertLabel(label), // corresponding property name in data
+      stateProp = `${label.toLowerCase()}Order`, // corresponding property name in state
+      transactions = this.state.transactions;
+    let newOrder, sorted;
+    switch (this.state[stateProp]) {
+      // if column is currently sorted descending, search ascending, and vice versa
+      case 'up':
+        newOrder = 'down';
+        sorted = transactions.reverse();
+        break;
+      case 'down':
+        newOrder = 'up';
+        sorted = transactions.reverse();
+        break;
+      default:
+        // sort descending initially for columns with numerical values, ascending for columns with string values
+        [newOrder, sorted] = isNaN(transactions[0][dataProp]) ? ['up', this.alphaSort(dataProp)] : ['down', this.numSort(dataProp)];
+    }
+    const newState = { transactions: sorted, descriptionOrder: null, dateOrder: null, amountOrder: null, toOrder: null, fromOrder: null };
+    newState[stateProp] = newOrder; // update state for column being sorted
+    this.setState(newState);
+  }
+
+  // sort alphabetically by designated string property
+  alphaSort(dataProp) {
+    const transactions = this.state.transactions;
+    return transactions.sort((a, b) => a[dataProp].toLowerCase() < b[dataProp].toLowerCase() ? -1 : 1);
+  }
+
+  // sort descending by designated numerical property
+  numSort(dataProp) {
+    const transactions = this.state.transactions;
+    return transactions.sort((a, b) => b[dataProp] - a[dataProp]);
+  }
+
+  // in DateMenu
+  selectDateRange(eventKey) {
+    this.setState({ dateRange: eventKey });
+  }
+
+  // in TypeMenu
+  selectType(eventKey) {
+    this.setState({ transType: eventKey });
+  }
+
+  // in Form
+  submitSearch(e) {
+    e.preventDefault();
+    const searchTerm = e.target.search.value;
+    this.setState({ searchTerm: searchTerm });
+    document.getElementById('search-form').reset();
+  }
+
+  // in Bar
+  clearFilters() {
+    this.setState({ searchTerm: '', dateRange: 0, transType: 0 });
+  }
+
+  // find transactions made within selected number of days prior
   filterByDate(transactions) {
     return this.state.dateRange ? transactions.filter(transaction => transaction.transTime > new Date() - this.state.dateRange * oneDay) : transactions;
   }
 
+  // show only deposits or withdrawals
   filterByType(transactions) {
     return this.state.transType ? transactions.filter(transaction => transaction.transAmt * this.state.transType > 0) : transactions;
   }
 
+  // search by description, sender or recipient, using full or partial search terms
   search(transactions) {
     const searchTerm = this.state.searchTerm.toLowerCase();
     return searchTerm ? transactions.filter(transaction => transaction.description.toLowerCase().includes(searchTerm) || transaction.transTo.toLowerCase().includes(searchTerm) || transaction.transFrom.toLowerCase().includes(searchTerm)) : transactions;
   }
 
-  submitSearch(e) {
-    e.preventDefault();
-    const searchTerm = e.target.search.value;
-    this.setState({ searchTerm: searchTerm, filtered: true });
-    document.getElementById('search-form').reset();
-  }
-
-  clearFilters() {
-    this.setState({ filtered: false })
-  }
-
+  // find transactions to display based on all selected filters
   filterTransactions(transactions) {
     return this.search(this.filterByType(this.filterByDate(transactions)));
+  }
+
+  // in Pages
+  selectPage(eventKey) {
+    this.setState({ activePage: eventKey })
   }
 
   render() {
 
     const balance = calculateBalance(this.props.transactions),
-      filteredTransactions = this.state.filtered ? this.filterTransactions(this.state.transactions) : this.state.transactions,
+      filteredTransactions = this.filterTransactions(this.state.transactions),
       change = this.calculateChange(),
-      items = Math.ceil(filteredTransactions.length / 10),
+      items = Math.ceil(filteredTransactions.length / 10), // total number of pages
       limit = this.state.activePage * 10,
-      currentTransactions = filteredTransactions.slice(limit - 10, limit);
+      currentTransactions = filteredTransactions.slice(limit - 10, limit); // display no more than 10 transactions at a time
       const childProps = Object.assign({}, this.state, {
         items: items,
         currentTransactions: currentTransactions,
@@ -142,6 +159,6 @@ export class App extends Component {
   }
 }
 
-const mapStateToProps = ({ transactions }) => ({ transactions })
+const mapStateToProps = ({ transactions }) => ({ transactions });
 
 export default connect(mapStateToProps, null)(App);

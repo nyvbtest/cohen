@@ -1,16 +1,14 @@
 import React from 'react';
 import { Table, Button, Glyphicon } from 'react-bootstrap';
 
-import { convertDate, convertAmount } from './utils';
-
-import './TransactionsTable.css';
+import { convertDate, convertAmount } from '../utils';
 
 const TransactionsTable = props => {
 
   const createGlyph = direction => <Glyphicon glyph={`glyphicon glyphicon-chevron-${direction}`} />;
 
   const createColName = label => {
-    const arrow = props[`${label.toLowerCase()}Order`];
+    const arrow = props[`${label.toLowerCase()}Order`]; // render proper glyphicon or none for column based on state
     return (
       <Button bsStyle='link' onClick={() => props.sortColumn(label)} >
         {arrow && createGlyph(arrow)}

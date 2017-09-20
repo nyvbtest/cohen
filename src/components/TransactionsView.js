@@ -15,7 +15,7 @@ const TransactionsView = props =>
         </div>
       </div>
       :
-      <div className='empty-table' >
+      <div className='empty-table'>
         <h4>No transactions</h4>
       </div>
     }

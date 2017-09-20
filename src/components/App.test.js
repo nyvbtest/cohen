@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { App } from './App';
-import { transactions } from './utils';
+import { transactions } from '../utils';
 
 test('sortColumn properly sorts transactions', () => {
   const app = mount(<App transactions={transactions} />),
@@ -78,4 +78,13 @@ test('search works', () => {
 
   app.instance().setState({ searchTerm: 'bank' });
   expect(app.instance().search(transactions).length).toBe(11);
+});
+
+test('clearFilters works', () => {
+  const app = mount(<App transactions={transactions} />);
+
+  app.instance().setState({ transType: 1 });
+  expect(app.instance().filterTransactions(transactions).length).toBe(10);
+  app.instance().clearFilters();
+  expect(app.instance().filterTransactions(transactions).length).toBe(11);
 });
