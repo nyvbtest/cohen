@@ -1,0 +1,39 @@
+#clear-filters {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar-text, .navbar-form {
+    display: none;
+  }
+}
+
+.search-btn {
+  background-color: steelblue;
+  border-color: white;
+  color: white;
+}
+
+.navbar-collapse, .navbar {
+  border-radius: 4px;
+  background-color: steelblue;
+  border: 0;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-text, #date-menu, #type-menu {
+  color: white;
+  text-shadow: none;
+}
+
+.navbar {
+  margin-bottom: 10px;
+}
+
+.navbar-brand {
+  padding-left: 30px;
+}
+
+.search-btn:focus {
+  color: white;
+  outline: none;
+}

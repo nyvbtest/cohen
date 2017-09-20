@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import { connect } from 'react-redux';
-import Transactions from './Transactions';
+import Bar from './Bar';
+import Sidebar from './Sidebar';
 import { convertLabel, calculateBalance, oneDay } from './utils';
-import { Well, FormControl, Button } from 'react-bootstrap';
 
 export class App extends Component {
   constructor(props){
@@ -18,12 +18,15 @@ export class App extends Component {
       fromOrder: null,
       dateRange: 0,
       transType: 0,
-      searchTerm: ''
+      searchTerm: '',
+      filtered: false
     }
     this.sortColumn = this.sortColumn.bind(this);
-    this.handleSelect = this.handleSelect.bind(this);
+    this.selectPage = this.selectPage.bind(this);
     this.submitSearch = this.submitSearch.bind(this);
-    this.search = this.search.bind(this);
+    this.selectDateRange = this.selectDateRange.bind(this);
+    this.selectType = this.selectType.bind(this);
+    this.clearFilters = this.clearFilters.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -62,8 +65,16 @@ export class App extends Component {
     return transactions.sort((a, b) => b[dataProp] - a[dataProp]);
   }
 
-  handleSelect(eventKey) {
+  selectPage(eventKey) {
     this.setState({ activePage: eventKey })
+  }
+
+  selectDateRange(eventKey) {
+    this.setState({ dateRange: eventKey, filtered: true })
+  }
+
+  selectType(eventKey) {
+    this.setState({ transType: eventKey, filtered: true })
   }
 
   calculateChange() {
@@ -82,12 +93,18 @@ export class App extends Component {
 
   search(transactions) {
     const searchTerm = this.state.searchTerm.toLowerCase();
-    return searchTerm ? transactions.filter(transaction => transaction.description.toLowerCase() === searchTerm || transaction.transTo.toLowerCase() === searchTerm || transaction.transFrom.toLowerCase() === searchTerm) : transactions;
+    return searchTerm ? transactions.filter(transaction => transaction.description.toLowerCase().includes(searchTerm) || transaction.transTo.toLowerCase().includes(searchTerm) || transaction.transFrom.toLowerCase().includes(searchTerm)) : transactions;
   }
 
   submitSearch(e) {
     e.preventDefault();
-    this.setState({ searchTerm: e.target.search.value })
+    const searchTerm = e.target.search.value;
+    this.setState({ searchTerm: searchTerm, filtered: true });
+    document.getElementById('search-form').reset();
+  }
+
+  clearFilters() {
+    this.setState({ filtered: false })
   }
 
   filterTransactions(transactions) {
@@ -97,43 +114,28 @@ export class App extends Component {
   render() {
 
     const balance = calculateBalance(this.props.transactions),
-      filteredTransactions = this.filterTransactions(this.state.transactions),
+      filteredTransactions = this.state.filtered ? this.filterTransactions(this.state.transactions) : this.state.transactions,
+      change = this.calculateChange(),
       items = Math.ceil(filteredTransactions.length / 10),
       limit = this.state.activePage * 10,
       currentTransactions = filteredTransactions.slice(limit - 10, limit);
+      const childProps = Object.assign({}, this.state, {
+        items: items,
+        currentTransactions: currentTransactions,
+        handleSelect: this.selectPage,
+        sortColumn: this.sortColumn
+      });
 
     return (
       <div className='container'>
+        <div>
+          <Bar submitSearch={this.submitSearch} selectDateRange={this.selectDateRange} selectType={this.selectType} clearFilters={this.clearFilters} />
+        </div>
         <div className='sidebar col-lg-2 col-md-2 col-sm-2 col-xs-12'>
-          <Well bsSize="large">
-            <p>{`Balance: $${balance.toLocaleString()}`}</p>
-            <p>{`Change in last 24 hours: ${this.calculateChange()}`}</p>
-            <FormControl componentClass="select" onChange={e => this.setState({ dateRange: +e.target.value })}>
-              <option value={0}>All</option>
-              <option value={7}>7</option>
-              <option value={30}>30</option>
-              <option value={90}>90</option>
-            </FormControl>
-            <FormControl componentClass="select" onChange={e => this.setState({ transType: +e.target.value })}>
-              <option value={0}>All</option>
-              <option value={1}>Deposit</option>
-              <option value={-1}>Withdrawal</option>
-            </FormControl>
-            <form onSubmit={this.submitSearch} >
-              <FormControl
-                name="search"
-                type="text"
-                label="Text"
-                placeholder="Enter text"
-              />
-              <Button type='submit'>
-                Submit
-              </Button>
-            </form>
-          </Well>
+          <Sidebar balance={balance} change={change} />
         </div>
         <div className='col-lg-10 col-md-10 col-sm-10 col-xs-12'>
-          <Transactions transactions={currentTransactions} descriptionOrder={this.state.descriptionOrder} dateOrder={this.state.dateOrder} amountOrder={this.state.amountOrder} toOrder={this.state.toOrder} fromOrder={this.state.fromOrder} sortColumn={this.sortColumn} items={items} activePage={this.state.activePage} handleSelect={this.handleSelect} />
+          {this.props.children && React.cloneElement(this.props.children, childProps)}
         </div>
       </div>
     );

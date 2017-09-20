@@ -33,7 +33,7 @@ export const transactions = [
     transId: 1,
     transAmt: 2,
     transTo: 'BankB',
-    transFrom: 'A',
+    transFrom: 'You',
     description: 'Donation',
     transTime: new Date() - oneDay * 91
   },
@@ -41,7 +41,7 @@ export const transactions = [
     transId: 2,
     transAmt: 2,
     transTo: 'BankA',
-    transFrom: 'A',
+    transFrom: 'You',
     description: 'Donation',
     transTime: new Date() - oneDay * 31
   },
@@ -49,7 +49,7 @@ export const transactions = [
     transId: 3,
     transAmt: 11,
     transTo: 'BankC',
-    transFrom: 'A',
+    transFrom: 'You',
     description: 'Donation',
     transTime: new Date() - oneDay * 8
   },
@@ -57,7 +57,7 @@ export const transactions = [
     transId: 4,
     transAmt: 2,
     transTo: 'BankD',
-    transFrom: 'A',
+    transFrom: 'You',
     description: 'Donation',
     transTime: new Date()
   },
@@ -65,7 +65,7 @@ export const transactions = [
     transId: 5,
     transAmt: 2,
     transTo: 'BankE',
-    transFrom: 'A',
+    transFrom: 'You',
     description: 'Salary',
     transTime: new Date()
   },
@@ -73,7 +73,7 @@ export const transactions = [
     transId: 6,
     transAmt: -1,
     transTo: 'BankF',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date()
   },
@@ -81,7 +81,7 @@ export const transactions = [
     transId: 7,
     transAmt: 2,
     transTo: 'BankG',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date()
   },
@@ -89,7 +89,7 @@ export const transactions = [
     transId: 8,
     transAmt: 2,
     transTo: 'BankH',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date()
   },
@@ -97,7 +97,7 @@ export const transactions = [
     transId: 9,
     transAmt: 2,
     transTo: 'BankI',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date()
   },
@@ -105,7 +105,7 @@ export const transactions = [
     transId: 10,
     transAmt: 2,
     transTo: 'BankJ',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date()
   },
@@ -113,7 +113,7 @@ export const transactions = [
     transId: 11,
     transAmt: 2,
     transTo: 'BankK',
-    transFrom: 'B',
+    transFrom: 'Me',
     description: 'Salary',
     transTime: new Date() - oneDay * 2
   }

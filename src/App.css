@@ -1,8 +1,19 @@
 .container {
   margin: 0;
   padding: 0;
+  margin: auto;
 }
 
 .sidebar {
   padding: 0;
+  background-color: steelblue;
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  .sidebar {
+    height: 100vh;
+  }
 }

@@ -70,9 +70,12 @@ test('search works', () => {
   app.instance().setState({ searchTerm: 'BankA' });
   expect(app.instance().search(transactions).length).toBe(1);
 
-  app.instance().setState({ searchTerm: 'B' });
+  app.instance().setState({ searchTerm: 'Me' });
   expect(app.instance().search(transactions).length).toBe(6);
 
   app.instance().setState({ searchTerm: 'donation' });
   expect(app.instance().search(transactions).length).toBe(4);
+
+  app.instance().setState({ searchTerm: 'bank' });
+  expect(app.instance().search(transactions).length).toBe(11);
 });
